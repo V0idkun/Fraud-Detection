@@ -3,3 +3,5 @@ pyvenv.cfg
 /Include/
 /Lib/
 /Include/
+/Data/
+/share/
