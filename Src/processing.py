@@ -2,6 +2,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer
+from imblearn.over_sampling import SMOTE
 
 def load_and_split(path):
     df = pd.read_csv(path)
@@ -15,6 +16,14 @@ def load_and_split(path):
     y_test = test['fraud_bool']
     
     return X_train, X_test, y_train, y_test
+
+def apply_smote(X_train, y_train):
+    """
+    Only apply SMOTE to the training data to balance the classes.
+    """
+    sm = SMOTE(random_state=42)
+    X_res, y_res = sm.fit_resample(X_train, y_train)
+    return X_res, y_res
 
 def get_preprocessor(X):
     cat_cols = X.select_dtypes(include=['object']).columns.tolist()
