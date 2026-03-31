@@ -25,7 +25,7 @@ def run_training(data_path, n_estimators, learning_rate):
         model = XGBClassifier(
             n_estimators=n_estimators, 
             learning_rate=learning_rate,
-            scale_pos_weight=50, # Rough estimate for 2% fraud
+            scale_pos_weight=10, # Rough estimate for 2% fraud 
             use_label_encoder=False
         )
 
