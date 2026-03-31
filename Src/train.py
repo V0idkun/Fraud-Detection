@@ -8,7 +8,7 @@ from sklearn.metrics import classification_report
 from processing import load_and_split, get_preprocessor,apply_smote
 from sklearn.metrics import accuracy_score
 
-def run_training(data_path, n_estimators, learning_rate):
+def run_training(data_path, n_estimators, learning_rate,use_smote):
     # 1. Start MLflow & Tag with Git
     repo = git.Repo(search_parent_directories=True)
     commit_hash = repo.head.object.hexsha
@@ -40,15 +40,17 @@ def run_training(data_path, n_estimators, learning_rate):
             scale_pos_weight=10, # Rough estimate for 2% fraud 
             use_label_encoder=False
         )
+        model.fit(X_train_final,y_train_final, eval_metric='logloss')
+        y_pred = model.predict(X_test_transformed)
+        
+        # pipeline = Pipeline([
+        #     ('preprocessor', preprocessor),
+        #     ('classifier', model)
+        # ])
 
-        pipeline = Pipeline([
-            ('preprocessor', preprocessor),
-            ('classifier', model)
-        ])
-
-        # 4. Train & Evaluate
-        pipeline.fit(X_train_final, y_train_final)
-        y_pred = pipeline.predict(X_test)
+        # # 4. Train & Evaluate
+        # pipeline.fit(X_train_final, y_train_final)
+        # y_pred = pipeline.predict(X_test)
         
         acc = accuracy_score(y_test, y_pred)
 
@@ -57,7 +59,8 @@ def run_training(data_path, n_estimators, learning_rate):
         report = classification_report(y_test, y_pred, output_dict=True)
         mlflow.log_metric("fraud_recall", report['1']['recall'])
         mlflow.log_metric("accuracy", acc)
-        mlflow.sklearn.log_model(pipeline, "model_pipeline")
+        # mlflow.sklearn.log_model(pipeline, "model_pipeline")
+        mlflow.sklearn.log_model(model, "xgboost_model")
         
         print(f"✅ Success! Recall: {report['1']['recall']:.2f}")
 
