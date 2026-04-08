@@ -8,4 +8,6 @@ entry_points:
       n_estimators: {type: int, default: 100}
       learning_rate: {type: float, default: 0.1}
       use_smote: {type: float, default: False} 
-    command: "python src/train.py --data_path {data_path} --n_estimators {n_estimators} --learning_rate {learning_rate}"
+      model_type: {type: str,default:xgboost }
+      tune: {type: bool, default: False}
+    command: "python src/train_tuning.py --model_type {model_type} --data_path {data_path} --n_estimators {n_estimators} --learning_rate {learning_rate} --use_smote {use_smote} --tune {tune}"
