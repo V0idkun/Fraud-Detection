@@ -10,7 +10,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report, accuracy_score
 from processing import load_and_split, get_preprocessor, apply_smote
 
-# --- 1. THE OBJECTIVE FUNCTION (The "Judge") ---
+# --- THE OBJECTIVE FUNCTION (The "Judge") ---
 def objective(trial, X_train, y_train, X_test, y_test, model_type):
     """This function is called by Optuna for every 'Trial'."""
     if model_type == "xgboost":
@@ -39,7 +39,7 @@ def objective(trial, X_train, y_train, X_test, y_test, model_type):
     report = classification_report(y_test, y_pred, output_dict=True)
     return report['1']['recall']
 
-# --- 2. THE MAIN TRAINING FUNCTION ---
+# ---THE MAIN TRAINING FUNCTION ---
 def run_training(model_type, data_path, n_estimators, learning_rate, use_smote, tune):
     repo = git.Repo(search_parent_directories=True)
     commit_hash = repo.head.object.hexsha
