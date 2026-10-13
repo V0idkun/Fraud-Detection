@@ -12,7 +12,7 @@ from processing import load_and_split, get_preprocessor,apply_smote
 from sklearn.metrics import accuracy_score
 
 def run_training(model_type,data_path, n_estimators, learning_rate,use_smote):
-    # 1. Start MLflow & Tag with Git
+    # Start MLflow & Tag with Git
     repo = git.Repo(search_parent_directories=True)
     commit_hash = repo.head.object.hexsha
 
@@ -20,15 +20,15 @@ def run_training(model_type,data_path, n_estimators, learning_rate,use_smote):
         mlflow.set_tag("git_commit", commit_hash)
         # mlflow.xgboost.autolog() # Automatically logs XGBoost params
 
-        # 2. Get Data
+        # Get Data
         X_train, X_test, y_train, y_test = load_and_split(data_path) 
         preprocessor = get_preprocessor(X_train)
 
-        # 3. Transform the data FIRST (SMOTE needs numbers, not 'Rent'/'Own' strings)
+        # Transform the data FIRST (SMOTE needs numbers, not 'Rent'/'Own' strings)
         X_train_transformed = preprocessor.fit_transform(X_train)
         X_test_transformed = preprocessor.transform(X_test)
     
-        # 4. Apply SMOTE if requested
+        # Apply SMOTE if requested
         if use_smote:
             mlflow.log_param("sampling_strategy", "SMOTE")
             X_train_final, y_train_final = apply_smote(X_train_transformed, y_train)
@@ -36,7 +36,7 @@ def run_training(model_type,data_path, n_estimators, learning_rate,use_smote):
         else:
             X_train_final, y_train_final = X_train_transformed, y_train
 
-        # 5. Build Pipeline with Class Imbalance fix
+        # Build Pipeline with Class Imbalance fix
         # scale_pos_weight helps the model focus on the 1% of fraud cases
 
         if model_type == "xgboost":
@@ -61,14 +61,14 @@ def run_training(model_type,data_path, n_estimators, learning_rate,use_smote):
         #     ('classifier', model)
         # ])
 
-        # # 4. Train & Evaluate
+        # Train & Evaluate
         # pipeline.fit(X_train_final, y_train_final)
         # y_pred = pipeline.predict(X_test)
         
         acc = accuracy_score(y_test, y_pred)
 
 
-        # 5. Log specific Fraud Metrics
+        # Log specific Fraud Metrics
         report = classification_report(y_test, y_pred, output_dict=True)
         mlflow.log_metric("fraud_recall", report['1']['recall'])
         # mlflow.sklearn.log_model(pipeline, "model_pipeline")
